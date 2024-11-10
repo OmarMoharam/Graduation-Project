@@ -3,6 +3,11 @@
 #define TEMPERATURE_BUS 2
 #define TEMPERATURE_RESOLUTION 9
 
+/* Timing for Temperature Sensor using millis */\
+const int temperature_u16Interval = 1000;
+unsigned long temperature_u32PreviousMillis = 0;
+
+
 TemperatureSensor tempSensor(TEMPERATURE_BUS, TEMPERATURE_RESOLUTION);
 
 void setup() {
@@ -18,7 +23,9 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Requesting temperatures...");
-  tempSensor.Temp_voidPrintTemperature();
-  delay(1000);
+  unsigned long temperature_u32CurrentMillis = millis();
+  if (temperature_u32CurrentMillis - temperature_u32PreviousMillis >= temperature_u16Interval) {
+    Serial.print("Requesting temperatures...");
+    tempSensor.Temp_voidPrintTemperature();
+  }
 }
