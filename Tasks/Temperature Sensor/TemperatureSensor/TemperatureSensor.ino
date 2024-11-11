@@ -23,8 +23,7 @@ void setup() {
 }
 
 void loop() {
-  unsigned long temperature_u32CurrentMillis = millis();
-  if (temperature_u32CurrentMillis - temperature_u32PreviousMillis >= temperature_u16Interval) {
+  c
     Serial.print("Requesting temperatures...");
     tempSensor.Temp_voidPrintTemperature();
   }
