@@ -14,8 +14,12 @@
 const int current_u16Interval = 1000;
 unsigned long current_u32PreviousMillis = 0;
 
-/* Safest Current for Motors */
-#define SAFEST_CURRENT 3
+/* Safest Current for Motors (8 Amp based on hardware team)*/
+#define SAFEST_CURRENT 8
+
+/* number of cycles for accuracy */
+#define MIDPOINT_CYCLES 100
+#define READING_CYCLES 10
 
 ACS712  current_sensor(CURRENT_PIN, INPUT_VOLTAGE, ARDUINO_ADC, SENSOR_SCALE_FACTOR);
 
@@ -24,7 +28,7 @@ void setup()
   Serial.begin(9600);
 
   /* there is an offset value from 2.5 to 2.54 so we take 100 reading and set the midpoint to 0 for accurate reading */
-  current_sensor.autoMidPoint(100);
+  current_sensor.autoMidPoint(MIDPOINT_CYCLES);
   Serial.println(current_sensor.getMidPoint());
 }
 
@@ -36,7 +40,7 @@ void loop()
 
   if (current_u32CurrentMillis - current_u32PreviousMillis >= current_u16Interval) {
     current_u32PreviousMillis = current_u32CurrentMillis;
-    Local_u8DCReading = current_sensor.mA_DC(10); // take the avg of 10 cycles
+    Local_u8DCReading = current_sensor.mA_DC(READING_CYCLES); // take the avg of 10 cycles
     Serial.println(Local_u8DCReading);
   }
 
