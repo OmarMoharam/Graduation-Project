@@ -33,7 +33,7 @@ void getAngle() {
   xVal = (analogRead(joystickX) / 1023.0) * 2 - 1 ;
   yVal = (analogRead(joystickY) / 1023.0) * 2 - 1 ;
 
-  /* mapping the angles from -100 to 0 and from 100 to 180  */
+  /* mapping the angles from -100 to 0 and from 100 to 180 */
   angleX = map(xVal * 100 , -100 , 100 , minAngle, maxAngle);
   angleY = map(yVal * 100 , -100 , 100 , minAngle, maxAngle);
 }
