@@ -20,7 +20,7 @@ unsigned long current_u32PreviousMillis = 0;
 
 // Pressure and Depth Sensor Setup
 unsigned long pressure_u32PreviousMillis = 0;
-const int clock = 9;
+const int clock = 8;
 
 // Temperature Sensor Setup
 #define TEMPERATURE_BUS 2
@@ -51,6 +51,10 @@ int angleX = 90, angleY = 90;
 
 // Lighting System Setup
 #define LIGHTS_PIN 14
+
+// Loop delay time
+unsigned long loopPreviousMillis = 0;
+const unsigned long loopInterval = 50; // 50 ms
 
 void setup() {
   Serial.begin(115200);
@@ -102,66 +106,73 @@ void setup() {
 }
 
 void loop() {
-  pollJoystick(); // Poll joystick data
+  unsigned long currentMillis = millis();
+  if (currentMillis - loopPreviousMillis >= loopInterval) {
+    loopPreviousMillis = currentMillis;
 
-  // Thruster calculations and outputs
-  calculateThrusters();
+    pollJoystick(); // Poll joystick data
 
-  // Apply thruster outputs
-  Thruster1.writeMicroseconds(constrain(map(T1, -100, 100, 1100, 1900), 1100, 1900));
-  Thruster2.writeMicroseconds(constrain(map(T2, -100, 100, 1100, 1900), 1100, 1900));
-  Thruster3.writeMicroseconds(constrain(map(T3, -100, 100, 1100, 1900), 1100, 1900));
-  Thruster4.writeMicroseconds(constrain(map(T4, -100, 100, 1100, 1900), 1100, 1900));
-  Thruster5.writeMicroseconds(constrain(map(T5, -100, 100, 1100, 1900), 1100, 1900));
-  Thruster6.writeMicroseconds(constrain(map(T6, -100, 100, 1100, 1900), 1100, 1900));
-
-  delay(50); // Refresh rate
-
-  // MPU6050 Readings
-  mpu6050.update();
-  if (millis() - MPU_longTimer > 1000) {
-    Serial.print("AngleX: "); Serial.print(mpu6050.getAngleX());
-    Serial.print("\tAngleY: "); Serial.print(mpu6050.getAngleY());
-    Serial.print("\tAngleZ: "); Serial.println(mpu6050.getAngleZ());
-    MPU_longTimer = millis();
-  }
-
-  // Current Sensor Monitoring
-  if (millis() - current_u32PreviousMillis >= 1000) {
-    current_u32PreviousMillis = millis();
-    int currentReading = current_sensor.mA_DC(10);
-    Serial.print("Current (mA): "); Serial.println(currentReading);
-
-    if (currentReading > SAFEST_CURRENT) {
-      Serial.println("Current exceeds safe limit! Stopping motors.");
-      setThrustersNeutral();
+    // Thruster calculations and outputs
+    calculateThrusters();
+  
+    // Apply thruster outputs
+    Thruster1.writeMicroseconds(constrain(map(T1, -100, 100, 1100, 1900), 1100, 1900));
+    Thruster2.writeMicroseconds(constrain(map(T2, -100, 100, 1100, 1900), 1100, 1900));
+    Thruster3.writeMicroseconds(constrain(map(T3, -100, 100, 1100, 1900), 1100, 1900));
+    Thruster4.writeMicroseconds(constrain(map(T4, -100, 100, 1100, 1900), 1100, 1900));
+    Thruster5.writeMicroseconds(constrain(map(T5, -100, 100, 1100, 1900), 1100, 1900));
+    Thruster6.writeMicroseconds(constrain(map(T6, -100, 100, 1100, 1900), 1100, 1900));
+  
+    delay(50); // Refresh rate
+  
+    // MPU6050 Readings
+    mpu6050.update();
+    if (millis() - MPU_longTimer > 1000) {
+      Serial.print("AngleX: "); Serial.print(mpu6050.getAngleX());
+      Serial.print("\tAngleY: "); Serial.print(mpu6050.getAngleY());
+      Serial.print("\tAngleZ: "); Serial.println(mpu6050.getAngleZ());
+      MPU_longTimer = millis();
     }
-  }
-
-  // Pressure and Depth Readings
-  clockSetup(clock);
-  if (millis() - pressure_u32PreviousMillis >= 1000) {
-    pressure_u32PreviousMillis = millis();
-    Serial.print("Pressure (mbar): "); Serial.println(getPressureinMBAR());
-    Serial.print("Depth (m): "); Serial.println(getDepthinMeter(getPressureinMBAR()));
-    Serial.print("Temperature (C): "); Serial.println(getTemperatureinC());
-  }
-
-  // Temperature Sensor Monitoring
-  if (millis() - temperature_u32PreviousMillis >= 1000) {
-    temperature_u32PreviousMillis = millis();
-    Serial.print("Temperature: ");
-    tempSensor.Temp_voidPrintTemperature();
-  }
-
-  // Camera Control
-  angleX = map(cameraValueX, 0, 1023, 0, 180);
-  angleY = map(cameraValueY, 0, 1023, 0, 180);
-  servoX.write(angleX);
-  servoY.write(angleY);
-
-  // Lighting Control
-  controlLighting();
+  
+    // Current Sensor Monitoring
+    if (millis() - current_u32PreviousMillis >= 1000) {
+      current_u32PreviousMillis = millis();
+      int currentReading = current_sensor.mA_DC(10);
+      Serial.print("Current (mA): "); Serial.println(currentReading);
+  
+      if (currentReading > SAFEST_CURRENT) {
+        Serial.println("Current exceeds safe limit! Stopping motors.");
+        setThrustersNeutral();
+      }
+    }
+  
+    // Pressure and Depth Readings
+    clockSetup(clock);
+    if (millis() - pressure_u32PreviousMillis >= 1000) {
+      pressure_u32PreviousMillis = millis();
+      Serial.print("Pressure (mbar): "); Serial.println(getPressureinMBAR());
+      Serial.print("Depth (m): "); Serial.println(getDepthinMeter(getPressureinMBAR()));
+      Serial.print("Temperature (C): "); Serial.println(getTemperatureinC());
+    }
+  
+    // Temperature Sensor Monitoring
+    if (millis() - temperature_u32PreviousMillis >= 1000) {
+      temperature_u32PreviousMillis = millis();
+      Serial.print("Temperature: ");
+      tempSensor.Temp_voidPrintTemperature();
+    }
+  
+    // Camera Control
+    angleX = map(cameraValueX, 0, 1023, 0, 180);
+    angleY = map(cameraValueY, 0, 1023, 0, 180);
+    servoX.write(angleX);
+    servoY.write(angleY);
+  
+    // Lighting Control
+    controlLighting();
+    }
+}
+  
 }
 
 void setThrustersNeutral() {
@@ -179,11 +190,6 @@ void pollJoystick() {
   Wire.write(1); // Request joystick data
   Wire.endTransmission();
 
-  if (Wire.available() < 9) {
-    Serial.println("Error: Incomplete joystick data received.");
-    return; // Avoid processing incomplete data
-  }
-
   Wire.requestFrom(groundStationAddress, 9);
   if (Wire.available() == 9) {
     surge = Wire.read();
@@ -195,6 +201,10 @@ void pollJoystick() {
     Button = Wire.read();
     cameraValueX = Wire.read();
     cameraValueY = Wire.read();
+  } else {
+    Serial.println("Error: Incomplete joystick data received.");
+    // Optionally, set all joystick values to neutral (0)
+    surge = sway = yaw = heave = pitch = roll = Button = cameraValueX = cameraValueY = 0;
   }
 }
 
@@ -208,11 +218,11 @@ void calculateThrusters() {
 }
 
 void controlLighting() {
-    if (Button == 1) {
-      digitalWrite(LIGHTS_PIN, HIGH);
-      Serial.println("Light ON");
-    } else if (Button == 0) {
-      digitalWrite(LIGHTS_PIN, LOW);
-      Serial.println("Light OFF");
-    }
+  if (Button == 1) {
+    digitalWrite(LIGHTS_PIN, HIGH);
+    Serial.println("Light ON");
+  } else {
+    digitalWrite(LIGHTS_PIN, LOW);
+    Serial.println("Light OFF");
+  }
 }
