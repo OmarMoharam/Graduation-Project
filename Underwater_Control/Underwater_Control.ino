@@ -1,13 +1,13 @@
 #include "sensors_and_actuators.h"
 
 void setup() {
-  setupSensorsAndActuators();
+  setupSensorsAndActuators(); // Initialize sensors and actuators
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  if (currentMillis - loopPreviousMillis >= loopInterval) {
-    loopPreviousMillis = currentMillis;
+  unsigned long currentMillis = millis(); // Get current time
+  if (currentMillis - loopPreviousMillis >= loopInterval) { // Check if loop interval has elapsed
+    loopPreviousMillis = currentMillis; // Update loop timestamp
 
     pollJoystick(); // Poll joystick data
 
@@ -23,43 +23,43 @@ void loop() {
     Thruster6.writeMicroseconds(constrain(map(T6, -100, 100, 1100, 1900), 1100, 1900));
   
     // Current Sensor Monitoring
-    if (millis() - current_u32PreviousMillis >= 1000) {
-      current_u32PreviousMillis = millis();
-      int currentReading = current_sensor.mA_DC(10);
+    if (millis() - currentSensorTimestamp >= 1000) { // Check if 1 second has elapsed
+      currentSensorTimestamp = millis(); // Update current sensor timestamp
+      int currentReading = current_sensor.mA_DC(10); // Read current
       Serial.print("Current (mA): "); Serial.println(currentReading);
   
-      if (currentReading > SAFEST_CURRENT) {
+      if (currentReading > SAFEST_CURRENT) { // Check if current exceeds safe limit
         Serial.println("Current exceeds safe limit! Stopping motors.");
-        setThrustersNeutral();
+        setThrustersNeutral(); // Stop motors
       }
     }
   
     // Pressure and Depth Readings
-    clockSetup(clock);
-    if (millis() - pressure_u32PreviousMillis >= 1000) {
-      pressure_u32PreviousMillis = millis();
+    clockSetup(clock); // Initialize pressure sensor clock
+    if (millis() - pressureSensorTimestamp >= 1000) { // Check if 1 second has elapsed
+      pressureSensorTimestamp = millis(); // Update pressure sensor timestamp
       Serial.print("Pressure (mbar): "); Serial.println(getPressureinMBAR());
       Serial.print("Depth (m): "); Serial.println(getDepthinMeter(getPressureinMBAR()));
       Serial.print("Temperature (C): "); Serial.println(getTemperatureinC());
     }
   
     // Temperature Sensor Monitoring
-    if (millis() - temperature_u32PreviousMillis >= 1000) {
-      temperature_u32PreviousMillis = millis();
+    if (millis() - temperatureSensorTimestamp >= 1000) { // Check if 1 second has elapsed
+      temperatureSensorTimestamp = millis(); // Update temperature sensor timestamp
       Serial.print("Temperature: ");
-      tempSensor.Temp_voidPrintTemperature();
+      tempSensor.Temp_voidPrintTemperature(); // Print temperature
     }
   
     // Camera Control
-    angleX = map(cameraValueX, 0, 1023, 0, 180);
-    angleY = map(cameraValueY, 0, 1023, 0, 180);
-    servoX.write(angleX);
-    servoY.write(angleY);
+    angleX = map(cameraValueX, 0, 1023, 0, 180); // Map camera X-axis input to servo angle
+    angleY = map(cameraValueY, 0, 1023, 0, 180); // Map camera Y-axis input to servo angle
+    servoX.write(angleX); // Set X-axis servo angle
+    servoY.write(angleY); // Set Y-axis servo angle
   
     // Lighting Control
-    controlLighting();
+    controlLighting(); // Control lighting system
 
     // Update IMU Data
-    updateIMUData();
+    updateIMUData(); // Update IMU data and compute PID outputs
   }
 }

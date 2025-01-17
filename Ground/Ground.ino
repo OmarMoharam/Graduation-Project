@@ -42,8 +42,8 @@ void loop() {
   int yaw = constrain(map(Twist, 0, 255, -100, 100), -100, 100);
   int heave = constrain(map(Slider, 0, 255, -100, 100), -100, 100);
 
-  int pitch = (Hat == 0) ? 50 : (Hat == 4) ? -50 : 0; // Up/Down
-  int roll = (Hat == 6) ? 50 : (Hat == 2) ? -50 : 0; // Left/Right
+  int pitch = (Hat == 0) ? 100 : (Hat == 4) ? -100 : 0; // Up/Down
+  int roll = (Hat == 6) ? 100 : (Hat == 2) ? -100 : 0; // Left/Right
 
   int cameraValueX = analogRead(cameraControlX);
   int cameraValueY = analogRead(cameraControlY);
