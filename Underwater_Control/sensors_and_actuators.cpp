@@ -13,7 +13,7 @@ unsigned long currentSensorTimestamp = 0; // Timestamp for current sensor readin
 // Pressure and Depth Sensor Setup
 unsigned long pressureSensorTimestamp = 0; // Timestamp for pressure sensor readings
 const int clock = 8; // Clock pin for pressure sensor
-int maxDepth = 5, minDepth = 0; // Maximum and minimum depth limits
+int maxDepth = 100, minDepth = 10; // Maximum and minimum depth limits
 
 // Temperature Sensor Setup
 TemperatureSensor tempSensor(TEMPERATURE_BUS, TEMPERATURE_RESOLUTION); // Temperature sensor object
@@ -53,6 +53,14 @@ PID rollPID(&inputRoll, &outputRoll, &setpointRoll, kp, ki, kd, DIRECT); // Roll
 PID pitchPID(&inputPitch, &outputPitch, &setpointPitch, kp, ki, kd, DIRECT); // Pitch PID controller
 PID yawPID(&inputYaw, &outputYaw, &setpointYaw, kp, ki, kd, DIRECT); // Yaw PID controller
 PID heavePID(&inputHeave, &outputHeave, &setpointHeave, kp, ki, kd, DIRECT); // Heave PID controller
+
+// Stepper Motor Initiation
+const int stepsPerRevolutoin = 200; // Depend on Stepper Type
+const float anglePerStep = 1.8; // Depend on Stepper Type
+const int targetAngle = 90; // Depend on the Design
+char directionFlag = 0; // To indicate the direction of the Stepper
+int stepsToMove = (targetAngle / anglePerStep);
+Stepper sportModeStepper(stepsToMove, 15, 16, 17, 18); // Stepper Motor Pins in the Arduino Mega
 
 // Function Implementations
 void setupSensorsAndActuators() {
@@ -100,6 +108,9 @@ void setupSensorsAndActuators() {
   pitchPID.SetMode(AUTOMATIC); // Enable pitch PID controller
   yawPID.SetMode(AUTOMATIC); // Enable yaw PID controller
   heavePID.SetMode(AUTOMATIC); // Enable heave PID controller
+
+  // Stepper Motor Initialization
+  sportModeStepper.setSpeed(30);
 }
 
 void pollJoystick() {
@@ -158,6 +169,19 @@ void controlLighting() {
   } else {
     digitalWrite(LIGHTS_PIN, LOW); // Turn off lights
     Serial.println("Light OFF");
+  }
+}
+
+void controlSportMode() {
+  if (Button == 11) {
+    if (directionFlag == 0) {
+      sportModeStepper.step(stepsToMove); // Open the Sport Mode
+      directionFlag = 1;
+    }
+    else if (directionFlag == 1) {
+      sportModeStepper.step(-stepsToMove); // Close the Sport Mode
+      directionFlag = 0;
+    }
   }
 }
 

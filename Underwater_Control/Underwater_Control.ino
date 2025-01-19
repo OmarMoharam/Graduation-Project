@@ -41,6 +41,10 @@ void loop() {
       Serial.print("Pressure (mbar): "); Serial.println(getPressureinMBAR());
       Serial.print("Depth (m): "); Serial.println(getDepthinMeter(getPressureinMBAR()));
       Serial.print("Temperature (C): "); Serial.println(getTemperatureinC());
+      if (getDepthinMeter(getPressureinMBAR()) > maxDepth) { // Check if ROV depth exceeds safe limit
+        Serial.println("Warning! YOU REACHED THE MAXIMUM DEPTH, PLEASE HEAVE UP");
+        setThrustersNeutral(); // Stop motors
+      }
     }
   
     // Temperature Sensor Monitoring
@@ -61,5 +65,8 @@ void loop() {
 
     // Update IMU Data
     updateIMUData(); // Update IMU data and compute PID outputs
+
+    // SportMode control
+    controlSportMode(); // Control the SportMode for fast linear speed
   }
 }

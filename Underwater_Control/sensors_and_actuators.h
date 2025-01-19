@@ -9,6 +9,7 @@
 #include "MPU6050_Sensor.h"
 #include "HMC5883L_Sensor.h"
 #include <PID_v1_bc.h> // Include PID library
+#include <Stepper.h> // Include Stepper Motor
 
 // MPU6050 + Magnetometer Setup
 extern MPU6050_Sensor mpu; // MPU6050 sensor for roll, pitch, and yaw measurements
@@ -70,6 +71,14 @@ extern double kp, ki, kd; // PID tuning parameters
 extern PID rollPID, pitchPID, yawPID; // PID controllers for roll, pitch, and yaw
 extern PID heavePID; // PID controller for depth
 
+// Stepper Motor Setup
+extern const int stepsPerRevolutoin;
+extern const float anglePerStep;
+extern const int targetAngle;
+extern int stepsToMove;
+extern char directionFlag;
+extern Stepper sportModeStepper;
+
 // Function Declarations
 void setupSensorsAndActuators(); // Initialize sensors and actuators
 void pollJoystick(); // Read joystick data
@@ -77,5 +86,6 @@ void calculateThrusters(); // Calculate thruster outputs
 void setThrustersNeutral(); // Set thrusters to neutral position
 void controlLighting(); // Control the lighting system
 void updateIMUData(); // Update IMU data and compute PID outputs
+void controlSportMode(); // Open Sport Mode in the ROV
 
 #endif
