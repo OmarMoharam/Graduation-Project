@@ -41,7 +41,7 @@ double inputRoll = 0, inputPitch = 0, inputYaw = 0; // Actual roll, pitch, and y
 double inputHeave = 0; // Actual depth
 double outputRoll = 0, outputPitch = 0, outputYaw = 0; // PID outputs for roll, pitch, and yaw
 double outputHeave = 0; // PID output for depth
-double kp = 10.0, ki = 2.0, kd = 10.0; // PID tuning parameters (tune as needed)
+double kp = 10.0, ki = 3.0, kd = 10.0; // PID tuning parameters (tune as needed)
 
 // Initialize PID controllers
 PID rollPID(&inputRoll, &outputRoll, &setpointRoll, kp, ki, kd, DIRECT); // Roll PID controller
