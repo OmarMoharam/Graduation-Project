@@ -54,12 +54,6 @@ void loop() {
       tempSensor.Temp_voidPrintTemperature(); // Print temperature
     }
   
-    // Camera Control
-    angleX = map(cameraValueX, 0, 1023, 0, 180); // Map camera X-axis input to servo angle
-    angleY = map(cameraValueY, 0, 1023, 0, 180); // Map camera Y-axis input to servo angle
-    servoX.write(angleX); // Set X-axis servo angle
-    servoY.write(angleY); // Set Y-axis servo angle
-  
     // Lighting Control
     controlLighting(); // Control lighting system
 

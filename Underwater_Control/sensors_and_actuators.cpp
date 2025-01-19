@@ -26,11 +26,6 @@ int T1 = 0, T2 = 0, T3 = 0, T4 = 0, T5 = 0, T6 = 0; // Thruster output values
 // Joystick Variables
 int groundStationAddress = 8; // I2C address of the ground station
 int surge = 0, sway = 0, yaw = 0, heave = 0, pitch = 0, roll = 0, Button = 0; // Joystick input values
-int cameraValueX = 0, cameraValueY = 0; // Camera control values
-
-// Camera Servo Setup
-Servo servoX, servoY; // Camera servo objects
-int angleX = 90, angleY = 90; // Camera servo angles
 
 // Lighting System Setup
 bool isLightOn = false; // Lighting system state
@@ -92,13 +87,6 @@ void setupSensorsAndActuators() {
   Thruster6.attach(14); // Attach Thruster6 to pin 14
   setThrustersNeutral(); // Set thrusters to neutral position
 
-  // Camera Servo Initialization
-  servoX.attach(SERVO_X_PIN); // Attach X-axis camera servo
-  servoY.attach(SERVO_Y_PIN); // Attach Y-axis camera servo
-  servoX.write(angleX); // Set initial X-axis angle
-  servoY.write(angleY); // Set initial Y-axis angle
-  Serial.println("Camera Servo Control Initialized");
-
   // Lighting Initialization
   pinMode(LIGHTS_PIN, OUTPUT); // Set lighting pin as output
   digitalWrite(LIGHTS_PIN, LOW); // Turn off lights by default
@@ -127,8 +115,6 @@ void pollJoystick() {
     pitch = Wire.read(); // Read pitch input
     roll = Wire.read(); // Read roll input
     Button = Wire.read(); // Read button input
-    cameraValueX = Wire.read(); // Read camera X-axis input
-    cameraValueY = Wire.read(); // Read camera Y-axis input
 
     // Set desired angles and depth from joystick
     setpointRoll = map(roll, -100, 100, -30, 30); // Map roll input to ±30 degrees
@@ -137,7 +123,7 @@ void pollJoystick() {
     setpointHeave = map(heave, -100, 100, minDepth, maxDepth); // Map heave input to depth range
   } else {
     Serial.println("Error: Incomplete joystick data received."); // Log error
-    surge = sway = yaw = heave = pitch = roll = Button = cameraValueX = cameraValueY = 0; // Reset inputs
+    surge = sway = yaw = heave = pitch = roll = Button = 0; // Reset inputs
     setThrustersNeutral(); // Reset thrusters to neutral
   }
 }

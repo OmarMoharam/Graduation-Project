@@ -44,13 +44,6 @@ extern int T1, T2, T3, T4, T5, T6; // Thruster output values
 // Joystick Variables
 extern int groundStationAddress; // I2C address of the ground station
 extern int surge, sway, yaw, heave, pitch, roll, Button; // Joystick input values
-extern int cameraValueX, cameraValueY; // Camera control values
-
-// Camera Servo Setup
-extern Servo servoX, servoY; // Camera servo objects
-#define SERVO_X_PIN 6 // Pin for X-axis camera servo
-#define SERVO_Y_PIN 7 // Pin for Y-axis camera servo
-extern int angleX, angleY; // Camera servo angles
 
 // Lighting System Setup
 #define LIGHTS_PIN 14 // Pin connected to the lighting system
